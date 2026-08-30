@@ -8,7 +8,7 @@ export default function Cart() {
     return (
       <div className="page">
         <h1>Your cart is empty</h1>
-        <Link to="/">Continue shopping</Link>
+        <Link to="/shop">Continue shopping</Link>
       </div>
     );
   }
