@@ -21,12 +21,17 @@ exports.addItem = async (req, res, next) => {
     const { productId, quantity = 1 } = req.body;
     const product = await Product.findById(productId);
     if (!product || !product.isActive) return res.status(404).json({ message: 'Product not found' });
-    if (product.stock < quantity) return res.status(400).json({ message: 'Insufficient stock' });
 
     const cart = await getOrCreateCart(req.user._id);
     const existing = cart.items.find((i) => i.product.toString() === productId);
+    const requestedTotal = (existing?.quantity || 0) + Number(quantity);
+
+    if (product.stock < requestedTotal) {
+      return res.status(400).json({ message: 'Insufficient stock' });
+    }
+
     if (existing) {
-      existing.quantity += Number(quantity);
+      existing.quantity = requestedTotal;
     } else {
       cart.items.push({
         product: product._id,
@@ -54,6 +59,9 @@ exports.updateItem = async (req, res, next) => {
     if (quantity <= 0) {
       cart.items = cart.items.filter((i) => i.product.toString() !== productId);
     } else {
+      const product = await Product.findById(productId);
+      if (!product || !product.isActive) return res.status(404).json({ message: 'Product not found' });
+      if (product.stock < quantity) return res.status(400).json({ message: 'Insufficient stock' });
       item.quantity = quantity;
     }
     await cart.save();
