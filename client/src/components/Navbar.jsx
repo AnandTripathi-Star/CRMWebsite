@@ -10,7 +10,7 @@ export default function Navbar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="brand">
+      <Link to="/shop" className="brand">
         AnandTripathi-Star
       </Link>
       <div className="nav-links">
