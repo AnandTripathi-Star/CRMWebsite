@@ -83,9 +83,14 @@ exports.listAllOrders = async (req, res, next) => {
   }
 };
 
+const ORDER_STATUSES = ['placed', 'processing', 'shipped', 'delivered', 'cancelled'];
+
 exports.updateOrderStatus = async (req, res, next) => {
   try {
     const { status } = req.body;
+    if (!ORDER_STATUSES.includes(status)) {
+      return res.status(400).json({ message: `Status must be one of: ${ORDER_STATUSES.join(', ')}` });
+    }
     const order = await Order.findById(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found' });
     order.status = status;
